@@ -6,7 +6,7 @@ from models.proj import Proj
 from models.button import Button
 from models.text import Text
 import time
-
+# adaadad
 FILE_DIR = os.path.dirname(__file__)
 FONT_DIR = os.path.join(FILE_DIR,"images", "EightBits.ttf")
 FPS = 60
