@@ -15,8 +15,6 @@ class Button:
     def draw(self, screen, font):
         color = self.active_color if self.is_selected else self.inactive_color
 
-        # pygame.draw.rect(screen, color, (self.x, self.y, self.width, self.height), 2)
-
         textSurf = font.render(self.text, False, color)
         textRect = textSurf.get_rect()
         textRect.center = ((self.x + (self.width / 2)), (self.y + (self.height / 2)))

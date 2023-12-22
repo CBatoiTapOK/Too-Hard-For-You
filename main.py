@@ -9,8 +9,6 @@ import time
 
 FILE_DIR = os.path.dirname(__file__)
 FONT_DIR = os.path.join(FILE_DIR,"images", "EightBits.ttf")
-WIDTH = 1280
-HEIGHT = 840
 FPS = 60
 
 def start_game():
@@ -18,6 +16,7 @@ def start_game():
     global player
     player.spawned = time.time()
     in_main_menu = False
+    pygame.mixer.music.set_volume(0.15)
 
 def end_game():
     global run
@@ -25,6 +24,7 @@ def end_game():
 
 def resume():
     global pause
+    pygame.mixer.music.unpause()
     pause = False
 
 def restart():
@@ -39,6 +39,7 @@ def restart():
     player_img = pygame.image.load(os.path.join(FILE_DIR, 'images','player.png'))
     player = Player(WIDTH/2, HEIGHT/2, player_img, WIDTH, HEIGHT)
     player.spawned = time.time()
+    pygame.mixer.music.play(-1)
 
 def handle_menu_events(event, buttons, selected_button):
     if event.type == pygame.KEYDOWN:
@@ -54,20 +55,20 @@ def handle_menu_events(event, buttons, selected_button):
             buttons[selected_button].action()
     return selected_button
 
-def draw_menu(screen, buttons, logo_text, button_font):
-
-    logo_text.draw(screen)
-
-    for button in buttons:
-        button.draw(screen, button_font)
-
 pygame.init()
+pygame.mouse.set_visible(False)
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+scr_inf = pygame.display.Info()
+WIDTH = scr_inf.current_w
+HEIGHT = scr_inf.current_h
 
 clock = pygame.time.Clock()
 
 in_main_menu = True
+pygame.mixer.music.load(os.path.join(FILE_DIR, "music", "BG_music.mp3"))
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.1)
 main_menu_buttons = [
     Button("Start",WIDTH/2, HEIGHT/2, 100, 50, (89, 89, 89), (255, 252, 252), start_game),
     Button("Exit",WIDTH/2, HEIGHT/2 + 100, 100, 50, (89, 89, 89), (255, 252, 252), end_game)
@@ -81,7 +82,7 @@ pause_menu_buttons = [
 
 dead = False
 dead_menu_buttons = [
-    Button("DIE AGAIN!!!",WIDTH/2, HEIGHT/2, 100, 50, (89, 89, 89), (255, 252, 252), restart),
+    Button("Restart",WIDTH/2, HEIGHT/2, 100, 50, (89, 89, 89), (255, 252, 252), restart),
     Button("Exit",WIDTH/2, HEIGHT/2 + 100, 100, 50, (89, 89, 89), (255, 252, 252), end_game)
 ]
 
@@ -94,6 +95,7 @@ attacks = Attacks()
 
 player_img = pygame.image.load(os.path.join(FILE_DIR, 'images','player.png'))
 player = Player(WIDTH/2, HEIGHT/2, player_img, WIDTH, HEIGHT)
+last_score_time = time.time()
 
 
 run = True
@@ -117,6 +119,7 @@ while run:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE and (time.time() - player.spawned) >= 1.5:
                     pause = True
+                    pygame.mixer.music.pause()
                     overlay = pygame.Surface((WIDTH, HEIGHT))
                     overlay.fill((0, 0, 0))
                     overlay.set_alpha(172)
@@ -164,6 +167,12 @@ while run:
         screen.fill((0, 0, 0))
 
         if not dead:
+            if time.time() - last_score_time >= 1:
+                player.score += 1
+                last_score_time = time.time()
+            score_font = pygame.font.Font(FONT_DIR, 120)
+            SCORE_TEXT = Text(f"{player.score}", WIDTH/2, HEIGHT/2, score_font, (71, 71, 71))
+            SCORE_TEXT.draw(screen)
             attacks.attack(player, (WIDTH, HEIGHT))
             attacks.attack(player, (WIDTH, HEIGHT))
             projs = attacks.projs
@@ -184,10 +193,12 @@ while run:
                     proj.rotated = True
 
                 if proj.rect.colliderect(player.rect) and (time.time() - player.spawned >= 1.5):
+                    pygame.mixer.music.stop()
                     dead = True
-                    k = 0 #впадлу придумывать плавное затухане просто счетчиком ебанул
+                    k = 0 #впадлу придумывать плавное затухане просто счетчиком сделал
 
     pygame.display.flip()
 
-
+pygame.mixer.music.stop()
+pygame.mixer.quit()
 pygame.quit()

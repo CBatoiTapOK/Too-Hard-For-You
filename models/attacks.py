@@ -9,39 +9,32 @@ class Attacks:
         self.last_attack = 0
         self.projs = []
         self.shoot_cooldown = 0
-        self.attack_change_cooldown = 3
+        self.attack_change_cooldown = 2
         self.hard_mode = False
         self.hard_mode_timer = 0
         self.pre_hard_mode = False
-        self.extra_attacks = 1
+        self.extra_attacks = 5
         self.offset = 0
         self.rotate_dir = 0
         self.shot_dir = 0
         self.edge = 0
-        self.sub_att = [None, None]
-        self.endlesstorture_timer = 0
-        self.shot_dir = 0
+
 
     def attack(self, player, screen_size):
-        hard_time = 50
+        hard_time = 30
         if time.time()-self.attack_timer >= self.attack_change_cooldown:
             self.attack_timer = time.time()
             self.last_attack = self.pattern
-            self.sub_att = [None, None]
 
             self.pattern = self.next_attack
             self.next_attack = random.randint(0, 3)
-            if self.last_attack != self.pattern:
-                player.score += 10
 
             if random.randint(0, 5) == 0 and not self.hard_mode and not self.pre_hard_mode and time.time()-player.spawned >= 1.5:
                 self.projs = []
                 self.hard_mode = True
-                self.extra_attacks = int(player.score / 100)
+                self.extra_attacks = int(player.score / 20)
                 self.hard_mode_timer = time.time()
             if not self.hard_mode:
-                if self.pre_hard_mode:
-                    player.score += 100
                 self.pre_hard_mode = False
 
         if self.hard_mode and time.time()-self.hard_mode_timer >= hard_time:
@@ -73,8 +66,8 @@ class Attacks:
                     # верх-низ
                     if self.shot_dir == 0:
                         x = random.randint(1, screen_size[0]-1)
-                        y = -Proj.obstacles["Arrow"].get_height()
-                        self.projs.append(Proj(x, y,"Arrow", (x, 100), 7)) # чтобы стрела смотрела вниз высота катинки с минусом
+                        y = -Proj.obstacles["Arrow"].get_height() # чтобы стрела смотрела вниз высота картинки с минусом
+                        self.projs.append(Proj(x, y,"Arrow", (x, 100), 7))
                     elif self.shot_dir == 1:
                         x = random.randint(1, screen_size[0]-1)
                         y = screen_size[1]
@@ -133,37 +126,36 @@ class Attacks:
 
         elif self.pattern == 3:
             if time.time()-self.shoot_cooldown >= 1/((self.extra_attacks/10)+1):
-                # Top
+                # верх
                 x, y = screen_size[0]*0.5-Proj.obstacles["Arrow"].get_height()*0.5, -Proj.obstacles["Arrow"].get_height()
                 self.projs.append(Proj(x, y,"Arrow", (player.rect.centerx-Proj.obstacles["Arrow"].get_height()*0.5, player.rect.centery-Proj.obstacles["Arrow"].get_height()*0.5), 5))
 
-                # Bottom
+                # низ
                 x, y = screen_size[0]*0.5-Proj.obstacles["Arrow"].get_height()*0.5, screen_size[1]
                 self.projs.append(Proj(x, y, "Arrow", (player.rect.centerx-Proj.obstacles["Arrow"].get_height()*0.5, player.rect.centery-Proj.obstacles["Arrow"].get_height()*0.5), 5))
 
-                # Left
+                # лево
                 x, y = -Proj.obstacles["Arrow"].get_height(), screen_size[1]*0.5-Proj.obstacles["Arrow"].get_height()*0.5
                 self.projs.append(Proj(x, y,"Arrow", (player.rect.centerx-Proj.obstacles["Arrow"].get_height()*0.5, player.rect.centery-Proj.obstacles["Arrow"].get_height()*0.5), 5))
 
-                # Right
+                # право
                 x, y = screen_size[0], screen_size[1]*0.5-Proj.obstacles["Arrow"].get_height()*0.5
                 self.projs.append(Proj(x, y,"Arrow", (player.rect.centerx-Proj.obstacles["Arrow"].get_height()*0.5, player.rect.centery-Proj.obstacles["Arrow"].get_height()*0.5), 5))
 
-                # TL Corner
+                # верхний левй угол
                 x, y = -Proj.obstacles["Arrow"].get_height(), -Proj.obstacles["Arrow"].get_height()
                 self.projs.append(Proj(x, y,"Arrow", (player.rect.centerx-Proj.obstacles["Arrow"].get_height()*0.5, player.rect.centery-Proj.obstacles["Arrow"].get_height()*0.5), 5))
 
-                # BL Corner
+                # верхний нижний угол
                 x, y = -Proj.obstacles["Arrow"].get_height(), screen_size[1]
                 self.projs.append(Proj(x, y,"Arrow", (player.rect.centerx-Proj.obstacles["Arrow"].get_height()*0.5, player.rect.centery-Proj.obstacles["Arrow"].get_height()*0.5), 5))
 
-                # TR Corner
+                # верхний правый угол
                 x, y = screen_size[0], -Proj.obstacles["Arrow"].get_height()
                 self.projs.append(Proj(x, y,"Arrow", (player.rect.centerx-Proj.obstacles["Arrow"].get_height()*0.5, player.rect.centery-Proj.obstacles["Arrow"].get_height()*0.5), 5))
 
-                # BR Corner
+                # нижний правый угол
                 x, y = screen_size[0], screen_size[1]
                 self.projs.append(Proj(x, y,"Arrow", (player.rect.centerx-Proj.obstacles["Arrow"].get_height()*0.5, player.rect.centery-Proj.obstacles["Arrow"].get_height()*0.5), 5))
 
                 self.shoot_cooldown = time.time()
-        # elif self.pattern == 4:

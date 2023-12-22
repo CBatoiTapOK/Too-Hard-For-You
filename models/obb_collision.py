@@ -1,12 +1,12 @@
 import pygame
 
 class OBB:
+    """"The Separating Axis Theorem" (Теорема о разделяющей оси)."""
     def __init__(self, center, size, angle):
         self.center = pygame.Vector2(center)
         self.size = pygame.Vector2(size)
         self.angle = angle
 
-        # utility vectors for calculating corner of bounding box
         self._tl = pygame.Vector2(-self.size.x / 2, self.size.y / 2)
         self._tr = pygame.Vector2(self.size.x / 2, self.size.y / 2)
         self._bl = pygame.Vector2(-self.size.x / 2, -self.size.y / 2)
