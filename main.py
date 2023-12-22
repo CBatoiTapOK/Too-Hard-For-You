@@ -59,6 +59,8 @@ pygame.init()
 pygame.mouse.set_visible(False)
 
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+icon = pygame.image.load(os.path.join(FILE_DIR, "images" ,"icon.ico"))
+pygame.display.set_icon(icon)
 scr_inf = pygame.display.Info()
 WIDTH = scr_inf.current_w
 HEIGHT = scr_inf.current_h
@@ -144,9 +146,15 @@ while run:
             screen.blit(overlay, (0, 0))
             k += 1
 
-        logo_font = pygame.font.Font(FONT_DIR, 120)
+        score_font = pygame.font.Font(FONT_DIR, 120)
+        SCORE_TEXT = Text(f"Score: {player.score}", WIDTH/2, (HEIGHT/2 - 160), score_font, (250, 250, 250))
+        SCORE_TEXT.draw(screen)
+
+        score_font = pygame.font.Font(FONT_DIR, 120)
         LOGO_TEXT = Text("Too Hard For You", WIDTH /2, 200, logo_font, (255, 255, 255))
         LOGO_TEXT.draw(screen)
+
+
 
         button_font = pygame.font.Font(FONT_DIR, 70)
         for button in dead_menu_buttons:
